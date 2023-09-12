@@ -1,13 +1,68 @@
 {{template "base" .}}
 
+{{define "css"}}
+    <style>
+        #form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 10px 30px;
+            border: 1px solid #ccc;
+            margin-top: 80px;
+            background-color: #e9ecef;
+        }
+
+        #form-container h2,
+        #form-container form label {
+            font-weight: 600;
+        }
+    </style>
+{{end}}
+
 {{define "title"}}
     Terminal virtual
 {{end}}
 
 {{define "content"}}
-    <h2>Terminal virtual</h2>
+    <div id="form-container">
+        <h2 class="mt-3 text-center">Terminal virtual</h2>
+        <hr />
+
+        <form action="/payment-succeeded" method="post" name="charge_form" id="charge_form" class="d-block needs-validations charge-form" autocomplete="off" novalidate="">
+            <div class="mb-3">
+                <label for="amount" class="form-label">Valor</label>
+                <input type="text" class="form-control" id="amount" name="amount" required autocomplete="amount-new">
+            </div>
+
+            <div class="mb-3">
+                <label for="cardholder-name" class="form-label">Nome do titular do cartão</label>
+                <input type="text" class="form-control" id="cardholder-name" name="cardholder_name" required autocomplete="cardholder-name-new">
+            </div>
+
+            <div class="mb-3">
+                <label for="cardholder-email" class="form-label">Email do titular do cartão</label>
+                <input type="email" class="form-control" id="cardholder-email" name="cardholder_email" required autocomplete="cardholder-email-new">
+            </div>
+
+            <div class="mb-3">
+                <label for="card-element" class="form-label">Cartão de Crédito</label>
+                <div id="card-element" class="form-control"></div>
+                <div class="alert-danger text-center" id="card-errors" role="alert"></div>
+                <div class="alert-success text-center" id="card-success" role="alert"></div>
+            </div>
+
+            <hr />
+
+            <a id="pay-button" href="javascript:void(0)" class="btn btn-primary" onclick="val()">Pagar</a>
+        </form>
+    </div>
 {{end}}
 
 {{define "js"}}
+    <script src="https://js.stripe.com/v3/"></script>
 
+    <script>
+        function val() {
+
+        }
+    </script>
 {{end}}
