@@ -30,17 +30,17 @@
         <form action="/payment-succeeded" method="post" name="charge_form" id="charge_form" class="d-block needs-validations charge-form" autocomplete="off" novalidate="">
             <div class="mb-3">
                 <label for="amount" class="form-label">Valor</label>
-                <input type="text" class="form-control" id="amount" name="amount" required autocomplete="amount-new">
+                <input type="text" class="form-control" id="amount" name="amount" required autocomplete="amount-new" placeholder="R$ 100,00">
             </div>
 
             <div class="mb-3">
                 <label for="cardholder-name" class="form-label">Nome do titular do cartão</label>
-                <input type="text" class="form-control" id="cardholder-name" name="cardholder_name" required autocomplete="cardholder-name-new">
+                <input type="text" class="form-control" id="cardholder-name" name="cardholder_name" required autocomplete="cardholder-name-new" placeholder="Jhon Doe">
             </div>
 
             <div class="mb-3">
                 <label for="cardholder-email" class="form-label">Email do titular do cartão</label>
-                <input type="email" class="form-control" id="cardholder-email" name="cardholder_email" required autocomplete="cardholder-email-new">
+                <input type="email" class="form-control" id="cardholder-email" name="cardholder_email" required autocomplete="cardholder-email-new" placeholder="jhon@email.com">
             </div>
 
             <div class="mb-3">
@@ -61,8 +61,40 @@
     <script src="https://js.stripe.com/v3/"></script>
 
     <script>
+        let card;
+        let stripe;
+
+        stripe = Stripe("pk_test_51NpZ00JcWFfX1Z09OzrAtIPsd7maru1WRam67uFSXViI8K0O8W3J35A5MBo0ULYWM0s9jPArAj3NycUgFENpSSfs00LCP45q0K")
+       
         function val() {
 
         }
+
+        (function() {
+            const elements = stripe.elements();
+            const style = {
+                base: {
+                    fontSize: '16px',
+                    lineHeight: '24px'
+                }
+            };
+
+            card = elements.create('card', { style: style, hidePostalCode: true });
+            card.mount('#card-element');
+
+            card.addEventListener('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                const displaySuccess = document.getElementById('card-success');
+
+                if (event.error) {
+                    displayError.classList.remove('d-none');
+                    displayError.textContent = event.error.message;
+                    displaySuccess.classList.add('d-none');
+                } else {
+                    displayError.classList.add('d-none');
+                    displaySuccess.textContent = 'Cartão válido';
+                }
+            });
+        })()
     </script>
 {{end}}
