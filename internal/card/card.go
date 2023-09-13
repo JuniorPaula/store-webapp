@@ -53,6 +53,23 @@ func cardErrorMessage(code stripe.ErrorCode) string {
 	case stripe.ErrorCodeExpiredCard:
 		msg = "Seu cartão está expirado."
 
+	case stripe.ErrorCodeIncorrectCVC:
+		msg = "O código de segurança do seu cartão está incorreto."
+
+	case stripe.ErrorCodeIncorrectZip:
+		msg = "O código postal falhou na validação."
+
+	case stripe.ErrorCodeAmountTooLarge:
+		msg = "O valor do pagamento é muito grande."
+
+	case stripe.ErrorCodeAmountTooSmall:
+		msg = "O valor do pagamento é muito pequeno."
+
+	case stripe.ErrorCodeBalanceInsufficient:
+		msg = "Seu cartão não tem saldo suficiente."
+
+	case stripe.ErrorCodePostalCodeInvalid:
+		msg = "O código postal falhou na validação."
 	default:
 		msg = "Ocorreu um erro ao processar seu pagamento."
 	}
