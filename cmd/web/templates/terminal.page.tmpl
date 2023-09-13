@@ -76,6 +76,11 @@
                     <span class="visually-hidden">Processando...</span>
                 </div>
             </div>
+
+            <input type="hidden" name="payment_intent" id="payment_intent">
+            <input type="hidden" name="payment_method" id="payment_method">
+            <input type="hidden" name="payment_amount" id="payment_amount">
+            <input type="hidden" name="payment_currency" id="payment_currency">
         </form>
     </div>
 {{end}}
@@ -109,6 +114,31 @@
 
             form.classList.add('was-validated');
             hidePayButton();
+
+            let amountToChange = String(parseFloat(document.getElementById('amount').value) * 100);
+            
+            let payload = {
+                amount: amountToChange,
+                currency: 'brl',
+            }
+
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+            
+            fetch("http://localhost:4001/api/v1/payment-intent", requestOptions)
+                .then(response => response.text())
+                .then(response => {
+                    let data;
+                    try {
+                        data = JSON.parse(response);
+                        console.log(data);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                })
         }
 
         (function() {
