@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"webapp/internal/driver"
 
 	"github.com/joho/godotenv"
 )
@@ -66,9 +67,22 @@ func main() {
 
 	cfg.stripe.key = os.Getenv("STRIPE_KEY")
 	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
+	cfg.db.dsn = fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true&tls=false",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_NAME"),
+	)
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	conn, err := driver.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	infoLog.Println("Database connection successful")
+	defer conn.Close()
 
 	tc := make(map[string]*template.Template)
 
