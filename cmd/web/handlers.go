@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"webapp/internal/models"
+)
 
 // VirtualTerminal is a handler which renders a page where the user can enter their payment details.
 func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +52,23 @@ func (app *application) ChargeOne(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["publishable_key"] = app.config.stripe.key
 
-	if err := app.renderTemplate(w, r, "buy-once", &templateData{StringMap: stringMap}, "stripe-js"); err != nil {
+	widget := models.Widget{
+		ID:             1,
+		Name:           "Custom Widget",
+		Desription:     "A custom widget for your website.",
+		InventoryLevel: 10,
+		Price:          1000,
+	}
+
+	data := make(map[string]interface{})
+	data["widget"] = widget
+
+	err := app.renderTemplate(w, r, "buy-once", &templateData{
+		StringMap: stringMap,
+		Data:      data,
+	}, "stripe-js")
+
+	if err != nil {
 		app.errorLog.Println(err.Error())
 		return
 	}
