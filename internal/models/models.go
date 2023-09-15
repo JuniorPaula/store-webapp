@@ -31,11 +31,69 @@ type Widget struct {
 	Description    string `json:"description"`
 	InventoryLevel int    `json:"inventory_level"`
 	Price          int    `json:"price"`
+	Image          string `json:"image"`
 
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
 
+// Order represents a customer order in the database.
+type Order struct {
+	ID            int `json:"id"`
+	WidgetID      int `json:"widget_id"`
+	TransactionID int `json:"transaction_id"`
+	StatusID      int `json:"status_id"`
+	Quantity      int `json:"quantity"`
+	Amount        int `json:"amount"`
+
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
+
+// Statuses represents the status of an order in the database.
+type Statuses struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
+
+// Transaction represents a transaction in the database.
+type TransactionStatuses struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
+
+// Transaction is a type to represent a transaction in the database.
+type Transaction struct {
+	ID                  int    `json:"id"`
+	Amount              int    `json:"amount"`
+	Currency            string `json:"currency"`
+	Lastfor             string `json:"last_for"`
+	BankReturnCode      string `json:"bank_return_code"`
+	TransactionStatusID int    `json:"transaction_status_id"`
+
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
+
+// User is a type to represent a user in the database.
+type User struct {
+	ID       int    `json:"id"`
+	FirsName string `json:"first_name"`
+	LastName string `json:"last_name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
+
+// OrderStatus represents the status of an order in the database.
 func (m *DBModel) GetWidget(ID int) (Widget, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
