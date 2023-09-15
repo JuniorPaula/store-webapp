@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 	"webapp/internal/driver"
+	"webapp/internal/models"
 
 	"github.com/joho/godotenv"
 )
@@ -35,6 +36,7 @@ type application struct {
 	errorLog      *log.Logger
 	templateCache map[string]*template.Template
 	version       string
+	DB            models.DBModel
 }
 
 func (app *application) serve() error {
@@ -92,6 +94,7 @@ func main() {
 		errorLog:      errorLog,
 		templateCache: tc,
 		version:       version,
+		DB:            models.DBModel{DB: conn},
 	}
 
 	err = app.serve()

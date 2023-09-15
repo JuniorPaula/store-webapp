@@ -1,7 +1,9 @@
 package models
 
 import (
+	"context"
 	"database/sql"
+	"log"
 	"time"
 )
 
@@ -32,4 +34,20 @@ type Widget struct {
 
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
+}
+
+func (m *DBModel) GetWidget(ID int) (Widget, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var widget Widget
+
+	row := m.DB.QueryRowContext(ctx, `select id, name from widgets where id = ?`, ID)
+	err := row.Scan(&widget.ID, &widget.Name)
+	if err != nil {
+		log.Println(err)
+		return widget, err
+	}
+
+	return widget, nil
 }

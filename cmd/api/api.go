@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 	"webapp/internal/driver"
+	"webapp/internal/models"
 
 	"github.com/joho/godotenv"
 )
@@ -31,6 +32,7 @@ type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
 	version  string
+	DB       models.DBModel
 }
 
 func (app *application) serve() error {
@@ -84,6 +86,7 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		version:  version,
+		DB:       models.DBModel{DB: conn},
 	}
 	err = app.serve()
 	errorLog.Fatal(err)
