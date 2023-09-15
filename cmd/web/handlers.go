@@ -7,7 +7,7 @@ func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) 
 	stringMap := make(map[string]string)
 	stringMap["publishable_key"] = app.config.stripe.key
 
-	if err := app.renderTemplate(w, r, "terminal", &templateData{StringMap: stringMap}); err != nil {
+	if err := app.renderTemplate(w, r, "terminal", &templateData{StringMap: stringMap}, "stripe-js"); err != nil {
 		app.errorLog.Println(err.Error())
 		return
 	}
@@ -46,7 +46,10 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 // ChargeOne is a handler which renders a page where the user can change the
 // quantity of a product they want to buy.
 func (app *application) ChargeOne(w http.ResponseWriter, r *http.Request) {
-	if err := app.renderTemplate(w, r, "buy-once", nil); err != nil {
+	stringMap := make(map[string]string)
+	stringMap["publishable_key"] = app.config.stripe.key
+
+	if err := app.renderTemplate(w, r, "buy-once", &templateData{StringMap: stringMap}, "stripe-js"); err != nil {
 		app.errorLog.Println(err.Error())
 		return
 	}
