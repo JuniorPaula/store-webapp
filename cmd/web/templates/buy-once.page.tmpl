@@ -13,6 +13,21 @@
         .card-header {
             background-color: #e9ecef;
         }
+
+        #card-messages {
+            position: fixed;
+            top: 0;
+            right: 0;
+            /* z-index: 9999; */
+            width: 300px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
     </style>
 {{end}}
 
@@ -22,6 +37,8 @@
 
 {{define "content"}}
 {{$widget := index .Data "widget"}}
+    
+    <div id="card-messages"></div>
 
     <div class="card">
         <div class="card-header">
