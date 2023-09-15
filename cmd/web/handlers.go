@@ -55,7 +55,7 @@ func (app *application) ChargeOne(w http.ResponseWriter, r *http.Request) {
 	widget := models.Widget{
 		ID:             1,
 		Name:           "Custom Widget",
-		Desription:     "A custom widget for your website.",
+		Description:    "A custom widget for your website.",
 		InventoryLevel: 10,
 		Price:          1000,
 	}

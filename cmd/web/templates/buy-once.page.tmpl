@@ -21,6 +21,8 @@
 {{end}}
 
 {{define "content"}}
+{{$widget := index .Data "widget"}}
+
     <div class="card">
         <div class="card-header">
             <h2 class="text-center">Comprar Widget</h2>
@@ -29,11 +31,14 @@
             <img src="/static/img/widget.png" class="image-fluid rounded mx-auto d-block" alt="">
             
             <form action="/payment-succeeded" method="post" name="charge_form" id="charge_form" class="d-block needs-validations charge-form" autocomplete="off" novalidate="">
-                <div class="mb-3">
-                    <label for="amount" class="form-label">Valor</label>
-                    <input type="text" class="form-control" id="amount" name="amount" required autocomplete="amount-new" placeholder="R$ 100,00">
-                </div>
-    
+
+                <input type="hidden" name="product_id" value="{{$widget.ID}}">
+                <input type="hidden" name="amount" value="{{$widget.Price}}">
+
+
+                <h3 class="text-center mb-2">{{$widget.Name}} R$:{{$widget.Price}}</h3>
+                <p class="mb-3">{{$widget.Description}}</p>
+
                 <div class="mb-3">
                     <label for="cardholder-name" class="form-label">Nome do titular do cartão</label>
                     <input type="text" class="form-control" id="cardholder-name" name="cardholder_name" required autocomplete="cardholder-name-new" placeholder="Jhon Doe">
@@ -53,7 +58,7 @@
     
                 <hr />
     
-                <a id="pay-button" href="javascript:void(0)" class="btn btn-primary" onclick="val()">Pagar</a>
+                <a id="pay-button" href="javascript:void(0)" class="btn btn-primary" onclick="val()">Comprar</a>
                 
                 <div id="processing-payment" class="text-center d-none">
                     <div class="spinner-border text-primary" role="status">

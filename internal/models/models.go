@@ -26,7 +26,7 @@ func NewModels(db *sql.DB) Models {
 type Widget struct {
 	ID             int    `json:"id"`
 	Name           string `json:"name"`
-	Desription     string `json:"description"`
+	Description    string `json:"description"`
 	InventoryLevel int    `json:"inventory_level"`
 	Price          int    `json:"price"`
 
