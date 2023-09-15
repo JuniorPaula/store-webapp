@@ -1,0 +1,7 @@
+development:
+  dialect: mysql
+  database: store_stripe
+  user: admin
+  password: admin
+  host: localhost
+  pool: 5
