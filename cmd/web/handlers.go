@@ -26,23 +26,37 @@ func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// PaymentSucceeded is a handler which renders a page to confirm that the payment succeeded.
-func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request) {
+type TransactionData struct {
+	FirtsName       string
+	LastName        string
+	Email           string
+	PaymentIntentID string
+	PaymentMethodID string
+	PaymentAmount   int
+	PaymentCurrency string
+	LastFour        string
+	ExpiryMonth     int
+	ExpiryYear      int
+	BankReturnCode  string
+}
+
+// GetTransactionData gets the transaction data from the form.
+func (app *application) GetTransactionData(r *http.Request) (TransactionData, error) {
+	var txnData TransactionData
 	err := r.ParseForm()
 	if err != nil {
 		app.errorLog.Println(err.Error())
-		return
+		return txnData, err
 	}
 
 	firtsName := r.Form.Get("first_name")
 	lastName := r.Form.Get("last_name")
-	cardHolder := r.Form.Get("cardholder_name")
 	email := r.Form.Get("cardholder_email")
 	paymentIntent := r.Form.Get("payment_intent")
 	paymentMethod := r.Form.Get("payment_method")
 	paymentAmount := r.Form.Get("payment_amount")
 	paymentCurrency := r.Form.Get("payment_currency")
-	widgetID, _ := strconv.Atoi(r.Form.Get("product_id"))
+	amount, _ := strconv.Atoi(paymentAmount)
 
 	card := card.Card{
 		Secret: app.config.stripe.secret,
@@ -52,37 +66,70 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	pi, err := card.RetrievePaymentIntent(paymentIntent)
 	if err != nil {
 		app.errorLog.Println(err.Error())
-		return
+		return txnData, err
 	}
 
 	pm, err := card.GetPaymentMethod(paymentMethod)
 	if err != nil {
 		app.errorLog.Println(err.Error())
-		return
+		return txnData, err
 	}
 
 	lastFour := pm.Card.Last4
 	expiryMonth := pm.Card.ExpMonth
 	expiryYear := pm.Card.ExpYear
 
+	txnData = TransactionData{
+		FirtsName:       firtsName,
+		LastName:        lastName,
+		Email:           email,
+		PaymentIntentID: paymentIntent,
+		PaymentMethodID: paymentMethod,
+		PaymentAmount:   amount,
+		PaymentCurrency: paymentCurrency,
+		LastFour:        lastFour,
+		ExpiryMonth:     int(expiryMonth),
+		ExpiryYear:      int(expiryYear),
+		BankReturnCode:  pi.LatestCharge.ID,
+	}
+
+	return txnData, nil
+}
+
+// PaymentSucceeded is a handler which renders a page to confirm that the payment succeeded.
+func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+
+	widgetID, _ := strconv.Atoi(r.Form.Get("product_id"))
+
+	// get transaction data
+	txnData, err := app.GetTransactionData(r)
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+
 	// create a new customer
-	customerID, err := app.SaveCustomer(firtsName, lastName, email)
+	customerID, err := app.SaveCustomer(txnData.FirtsName, txnData.LastName, txnData.Email)
 	if err != nil {
 		app.errorLog.Println("[ERROR] to save a customer:", err.Error())
 		return
 	}
 
 	// create a new transaction
-	amount, _ := strconv.Atoi(paymentAmount)
 	txn := models.Transaction{
-		Amount:              amount,
-		Currency:            paymentCurrency,
-		Lastfour:            lastFour,
-		ExpiryMonth:         int(expiryMonth),
-		ExpiryYear:          int(expiryYear),
-		PaymentIntent:       paymentIntent,
-		PaymentMethod:       paymentMethod,
-		BankReturnCode:      pi.LatestCharge.ID,
+		Amount:              txnData.PaymentAmount,
+		Currency:            txnData.PaymentCurrency,
+		Lastfour:            txnData.LastFour,
+		ExpiryMonth:         txnData.ExpiryMonth,
+		ExpiryYear:          txnData.ExpiryYear,
+		PaymentIntent:       txnData.PaymentIntentID,
+		PaymentMethod:       txnData.PaymentMethodID,
+		BankReturnCode:      txnData.BankReturnCode,
 		TransactionStatusID: 2,
 	}
 
@@ -99,7 +146,7 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		CustomerID:    customerID,
 		StatusID:      1,
 		Quantity:      1,
-		Amount:        amount,
+		Amount:        txnData.PaymentAmount,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
@@ -109,29 +156,17 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	data := make(map[string]interface{})
-	data["firstName"] = firtsName
-	data["lastName"] = lastName
-	data["cardholder"] = cardHolder
-	data["email"] = email
-	data["paymentIntent"] = paymentIntent
-	data["paymentMethod"] = paymentMethod
-	data["paymentAmount"] = paymentAmount
-	data["paymentCurrency"] = paymentCurrency
-	data["lastFour"] = lastFour
-	data["expiryMonth"] = expiryMonth
-	data["expiryYear"] = expiryYear
-	data["bankReturnCode"] = pi.LatestCharge.ID
-
-	// should be a redirect to a new page
-	app.Session.Put(r.Context(), "receipt", data)
-
+	app.Session.Put(r.Context(), "receipt", txnData)
 	http.Redirect(w, r, "/receipt", http.StatusSeeOther)
 
 }
 
+// Receipt is a handler which renders a page to confirm that the payment succeeded.
 func (app *application) Receipt(w http.ResponseWriter, r *http.Request) {
-	data := app.Session.Get(r.Context(), "receipt").(map[string]interface{})
+	txn := app.Session.Get(r.Context(), "receipt").(TransactionData)
+	data := make(map[string]interface{})
+	data["txn"] = txn
+
 	app.Session.Remove(r.Context(), "receipt")
 
 	if err := app.renderTemplate(w, r, "receipt", &templateData{Data: data}); err != nil {

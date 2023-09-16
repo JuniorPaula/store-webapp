@@ -21,20 +21,22 @@ Pagamento realizado com sucesso
 {{end}}
 
 {{define "content"}}
+{{$txn := index .Data "txn"}}
+
 <div class="card">
     <div class="card-header">
         <h2 class="mt-2">Pagamento realizado com sucesso</h2>
     </div>
     <div class="card-body">
-        <p><strong>Intenção de pagamento</strong>: {{index .Data "paymentIntent"}}</p>
-        <p><strong>Nome do cliente</strong>: {{index .Data "firstName"}} {{index .Data "lastName"}}</p>
-        <p><strong>Email</strong>: {{index .Data "email"}}</p>
-        <p><strong>Método de pagamento</strong>: {{index .Data "paymentMethod"}}</p>
-        <p><strong>Valor do pagamento</strong>: {{index .Data "paymentAmount"}}</p>
-        <p><strong>Moeda</strong>: {{index .Data "paymentCurrency"}}</p>
-        <p><strong>Útimos dígitos</strong>: {{index .Data "lastFour"}}</p>
-        <p><strong>Código do Banco</strong>: {{index .Data "bankReturnCode"}}</p>
-        <p><strong>Data de inspiração</strong>: {{index .Data "expiryMonth"}}/{{index .Data "expiryYear"}}</p>
+        <p><strong>Intenção de pagamento</strong>: {{$txn.PaymentIntentID}}</p>
+        <p><strong>Nome do cliente</strong>: {{$txn.FirtsName}} {{$txn.LastName}}</p>
+        <p><strong>Email</strong>: {{$txn.Email}}</p>
+        <p><strong>Método de pagamento</strong>: {{$txn.PaymentMethodID}}</p>
+        <p><strong>Valor do pagamento</strong>: {{formatCurrency $txn.PaymentAmount}}</p>
+        <p><strong>Moeda</strong>: {{$txn.PaymentCurrency}}</p>
+        <p><strong>Útimos dígitos</strong>: {{$txn.LastFour}}</p>
+        <p><strong>Código do Banco</strong>: {{$txn.BankReturnCode}}</p>
+        <p><strong>Data de inspiração</strong>: {{$txn.ExpiryMonth}}/{{$txn.ExpiryYear}}</p>
 
         <div class="my-3">
             <a href="/home" class="btn btn-primary">Voltar</a>

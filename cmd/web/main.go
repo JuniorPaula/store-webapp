@@ -59,8 +59,8 @@ func (app *application) serve() error {
 }
 
 func main() {
-	// make map interface into the session
-	gob.Register(map[string]interface{}{})
+	// make map interface into the session from the TransactionData struct
+	gob.Register(TransactionData{})
 
 	var err error
 	var cfg config
