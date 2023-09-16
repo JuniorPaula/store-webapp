@@ -9,6 +9,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+func (app *application) Home(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "home", &templateData{}); err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+}
+
 // VirtualTerminal is a handler which renders a page where the user can enter their payment details.
 func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "terminal", &templateData{}, "stripe-js"); err != nil {
@@ -53,6 +60,12 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	expiryMonth := pm.Card.ExpMonth
 	expiryYear := pm.Card.ExpYear
 
+	// create a new customer
+
+	// create a new order
+
+	// create a new transaction
+
 	data := make(map[string]interface{})
 	data["cardholder"] = cardHolder
 	data["email"] = email
@@ -64,6 +77,8 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	data["expiryMonth"] = expiryMonth
 	data["expiryYear"] = expiryYear
 	data["bankReturnCode"] = pi.LatestCharge.ID
+
+	// should be a redirect to a new page
 
 	if err := app.renderTemplate(w, r, "payment-succeeded", &templateData{Data: data}); err != nil {
 		app.errorLog.Println(err.Error())
