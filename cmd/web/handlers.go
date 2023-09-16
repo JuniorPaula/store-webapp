@@ -1,8 +1,11 @@
 package main
 
 import (
+	"log"
 	"net/http"
-	"webapp/internal/models"
+	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
 
 // VirtualTerminal is a handler which renders a page where the user can enter their payment details.
@@ -46,18 +49,19 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 // ChargeOne is a handler which renders a page where the user can change the
 // quantity of a product they want to buy.
 func (app *application) ChargeOne(w http.ResponseWriter, r *http.Request) {
-	widget := models.Widget{
-		ID:             1,
-		Name:           "Custom Widget",
-		Description:    "A custom widget for your website.",
-		InventoryLevel: 10,
-		Price:          1000,
+	id := chi.URLParam(r, "id")
+	widgetID, _ := strconv.Atoi(id)
+
+	widget, err := app.DB.GetWidget(widgetID)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 
 	data := make(map[string]interface{})
 	data["widget"] = widget
 
-	err := app.renderTemplate(w, r, "buy-once", &templateData{
+	err = app.renderTemplate(w, r, "buy-once", &templateData{
 		Data: data,
 	}, "stripe-js")
 
