@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"html/template"
@@ -58,6 +59,9 @@ func (app *application) serve() error {
 }
 
 func main() {
+	// make map interface into the session
+	gob.Register(map[string]interface{}{})
+
 	var err error
 	var cfg config
 

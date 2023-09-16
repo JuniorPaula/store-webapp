@@ -35,6 +35,10 @@ Pagamento realizado com sucesso
         <p><strong>Útimos dígitos</strong>: {{index .Data "lastFour"}}</p>
         <p><strong>Código do Banco</strong>: {{index .Data "bankReturnCode"}}</p>
         <p><strong>Data de inspiração</strong>: {{index .Data "expiryMonth"}}/{{index .Data "expiryYear"}}</p>
+
+        <div class="my-3">
+            <a href="/home" class="btn btn-primary">Voltar</a>
+        </div>
     </div>
 </div>
 {{end}}
