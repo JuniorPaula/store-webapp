@@ -80,6 +80,8 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		Lastfour:            lastFour,
 		ExpiryMonth:         int(expiryMonth),
 		ExpiryYear:          int(expiryYear),
+		PaymentIntent:       paymentIntent,
+		PaymentMethod:       paymentMethod,
 		BankReturnCode:      pi.LatestCharge.ID,
 		TransactionStatusID: 2,
 	}
