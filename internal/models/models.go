@@ -74,9 +74,9 @@ type Transaction struct {
 	ID                  int    `json:"id"`
 	Amount              int    `json:"amount"`
 	Currency            string `json:"currency"`
-	Lastfor             string `json:"last_for"`
-	ExpiryMonth         string `json:"expiry_month"`
-	ExpiryYear          string `json:"expiry_year"`
+	Lastfour            string `json:"last_four"`
+	ExpiryMonth         int    `json:"expiry_month"`
+	ExpiryYear          int    `json:"expiry_year"`
 	BankReturnCode      string `json:"bank_return_code"`
 	TransactionStatusID int    `json:"transaction_status_id"`
 
@@ -86,11 +86,11 @@ type Transaction struct {
 
 // User is a type to represent a user in the database.
 type User struct {
-	ID       int    `json:"id"`
-	FirsName string `json:"first_name"`
-	LastName string `json:"last_name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	ID        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
 
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
@@ -98,10 +98,10 @@ type User struct {
 
 // Customer is a type to represent a customer in the database.
 type Customer struct {
-	ID       int    `json:"id"`
-	FirsName string `json:"first_name"`
-	LastName string `json:"last_name"`
-	Email    string `json:"email"`
+	ID        int    `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
 
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
@@ -140,14 +140,14 @@ func (m *DBModel) GetWidget(ID int) (Widget, error) {
 	return widget, nil
 }
 
-// InsertOrder inserts an net txn into the database and return its id.
-func (m *DBModel) InsertTransacetion(txn Transaction) (int, error) {
+// InsertTransaction inserts an net txn into the database and return its id.
+func (m *DBModel) InsertTransaction(txn Transaction) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	stmt := `
 		insert into transactions
-			(amount, currency, last_for, bank_return_code, transaction_status_id, created_at, updated_at)
+			(amount, currency, last_four, bank_return_code, transaction_status_id, created_at, updated_at)
 		values	
 			(?, ?, ?, ?, ?, ?, ?)
 	`
@@ -155,7 +155,7 @@ func (m *DBModel) InsertTransacetion(txn Transaction) (int, error) {
 	result, err := m.DB.ExecContext(ctx, stmt,
 		txn.Amount,
 		txn.Currency,
-		txn.Lastfor,
+		txn.Lastfour,
 		txn.BankReturnCode,
 		txn.TransactionStatusID,
 		time.Now(),
@@ -182,9 +182,9 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 
 	stmt := `
 		insert into orders
-			(widget_id, transaction_id, status_id, quantity, amount, created_at, updated_at)
+			(widget_id, transaction_id, status_id, quantity, customer_id, amount, created_at, updated_at)
 		values	
-			(?, ?, ?, ?, ?, ?, ?)
+			(?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
 	result, err := m.DB.ExecContext(ctx, stmt,
@@ -192,6 +192,7 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 		order.TransactionID,
 		order.StatusID,
 		order.Quantity,
+		order.CustomerID,
 		order.Amount,
 		time.Now(),
 		time.Now(),
@@ -223,7 +224,7 @@ func (m *DBModel) InsertCustomer(c Customer) (int, error) {
 	`
 
 	result, err := m.DB.ExecContext(ctx, stmt,
-		c.FirsName,
+		c.FirstName,
 		c.LastName,
 		c.Email,
 		time.Now(),

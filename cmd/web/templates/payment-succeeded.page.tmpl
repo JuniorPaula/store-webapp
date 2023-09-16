@@ -27,7 +27,7 @@ Pagamento realizado com sucesso
     </div>
     <div class="card-body">
         <p><strong>Intenção de pagamento</strong>: {{index .Data "paymentIntent"}}</p>
-        <p><strong>Titular do cartão</strong>: {{index .Data "cardholder"}}</p>
+        <p><strong>Nome do cliente</strong>: {{index .Data "firstName"}} {{index .Data "lastName"}}</p>
         <p><strong>Email</strong>: {{index .Data "email"}}</p>
         <p><strong>Método de pagamento</strong>: {{index .Data "paymentMethod"}}</p>
         <p><strong>Valor do pagamento</strong>: {{index .Data "paymentAmount"}}</p>
