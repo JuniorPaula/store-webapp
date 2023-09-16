@@ -75,6 +75,8 @@ type Transaction struct {
 	Amount              int    `json:"amount"`
 	Currency            string `json:"currency"`
 	Lastfor             string `json:"last_for"`
+	ExpiryMonth         string `json:"expiry_month"`
+	ExpiryYear          string `json:"expiry_year"`
 	BankReturnCode      string `json:"bank_return_code"`
 	TransactionStatusID int    `json:"transaction_status_id"`
 
@@ -194,6 +196,40 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 		time.Now(),
 		time.Now(),
 	)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+// InsertCustomer inserts a customer into the database and return its id.
+func (m *DBModel) InsertCustomer(c Customer) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		insert into customers
+			(first_name, last_name, email, created_at, updated_at)
+		values
+			(?, ?, ?, ?, ?)
+	`
+
+	result, err := m.DB.ExecContext(ctx, stmt,
+		c.FirsName,
+		c.LastName,
+		c.Email,
+		time.Now(),
+		time.Now(),
+	)
+
 	if err != nil {
 		log.Println(err)
 		return 0, err
