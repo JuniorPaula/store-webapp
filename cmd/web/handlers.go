@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"webapp/internal/card"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -31,6 +32,27 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	paymentAmount := r.Form.Get("payment_amount")
 	paymentCurrency := r.Form.Get("payment_currency")
 
+	card := card.Card{
+		Secret: app.config.stripe.secret,
+		Key:    app.config.stripe.key,
+	}
+
+	pi, err := card.RetrievePaymentIntent(paymentIntent)
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+
+	pm, err := card.GetPaymentMethod(paymentMethod)
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+
+	lastFour := pm.Card.Last4
+	expiryMonth := pm.Card.ExpMonth
+	expiryYear := pm.Card.ExpYear
+
 	data := make(map[string]interface{})
 	data["cardholder"] = cardHolder
 	data["email"] = email
@@ -38,6 +60,10 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	data["paymentMethod"] = paymentMethod
 	data["paymentAmount"] = paymentAmount
 	data["paymentCurrency"] = paymentCurrency
+	data["lastFour"] = lastFour
+	data["expiryMonth"] = expiryMonth
+	data["expiryYear"] = expiryYear
+	data["bankReturnCode"] = pi.LatestCharge.ID
 
 	if err := app.renderTemplate(w, r, "payment-succeeded", &templateData{Data: data}); err != nil {
 		app.errorLog.Println(err.Error())

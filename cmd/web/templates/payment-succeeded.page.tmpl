@@ -32,6 +32,9 @@ Pagamento realizado com sucesso
         <p><strong>Método de pagamento</strong>: {{index .Data "paymentMethod"}}</p>
         <p><strong>Valor do pagamento</strong>: {{index .Data "paymentAmount"}}</p>
         <p><strong>Moeda</strong>: {{index .Data "paymentCurrency"}}</p>
+        <p><strong>Útimos dígitos</strong>: {{index .Data "lastFour"}}</p>
+        <p><strong>Código do Banco</strong>: {{index .Data "bankReturnCode"}}</p>
+        <p><strong>Data de inspiração</strong>: {{index .Data "expiryMonth"}}/{{index .Data "expiryYear"}}</p>
     </div>
 </div>
 {{end}}
