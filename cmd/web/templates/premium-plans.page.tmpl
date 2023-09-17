@@ -99,3 +99,135 @@
         </div>
     </div>
 {{end}}
+
+{{define "js"}}
+{{$widget := index .Data "widget"}}
+
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    let card;
+    let stripe;
+
+    const cardMessages = document.getElementById('card-messages');
+    const payButton = document.getElementById('pay-button');
+    const processing = document.getElementById('processing-payment');
+
+    stripe = Stripe('{{.StripePublishableKey}}')
+   
+    function hidePayButton() {
+        payButton.classList.add('d-none');
+        processing.classList.remove('d-none');
+    }
+
+    function showPayButton() {
+        payButton.classList.remove('d-none');
+        processing.classList.add('d-none');
+    }
+
+    function showCardError(msg) {
+        cardMessages.classList.remove('alert-success');
+        cardMessages.classList.add('alert-danger');
+        cardMessages.textContent = msg;
+        cardMessages.classList.remove('d-none');
+
+        setTimeout(() => {
+            cardMessages.classList.add('d-none');
+            document.getElementById('card-success').classList.add('d-none');
+        }, 5000);
+    }
+
+    function showCardSuccess() {
+        cardMessages.classList.remove('alert-danger');
+        cardMessages.classList.add('alert-success');
+        cardMessages.textContent = 'Pagamento realizado com sucesso!';
+        cardMessages.classList.remove('d-none');
+
+        setTimeout(() => {
+            cardMessages.classList.add('d-none');
+            document.getElementById('card-success').classList.add('d-none');
+        }, 5000);
+    }
+
+    function val() {
+        let form = document.getElementById('charge_form');
+        if (form.checkValidity() === false) {
+            this.event.preventDefault();
+            this.event.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+
+        form.classList.add('was-validated');
+        hidePayButton();
+
+        let amountToChange = document.getElementById('amount').value;
+
+        stripe.createPaymentMethod({
+            type: 'card',
+            card: card,
+            billing_details: {
+                email: document.getElementById('cardholder-email').value
+            }
+        }).then(stripePaymentMethodHandler);
+    }
+
+    function stripePaymentMethodHandler(result) {
+        if (result.error) {
+            showCardError(result.error.message);
+            showPayButton();
+        } else {
+            // create a customer and subscribe to plan
+            let payload = {
+                plan: '{{$widget.StripePlanID}}',
+                payment_method: result.paymentMethod.id,
+                email: document.getElementById('cardholder-email').value,
+                last_four: result.paymentMethod.card.last4,
+            }
+
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }
+
+            fetch('{{.API}}' + "/create-customer-and-subscribe-to-plan", requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    processing.classList.add('d-none');
+                    // set hidden vars
+                    // submit form
+                })
+        }
+    }
+
+    (function() {
+        const elements = stripe.elements();
+        const style = {
+            base: {
+                fontSize: '16px',
+                lineHeight: '24px'
+            }
+        };
+
+        card = elements.create('card', { style: style, hidePostalCode: true });
+        card.mount('#card-element');
+
+        card.addEventListener('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            const displaySuccess = document.getElementById('card-success');
+
+            if (event.error) {
+                displayError.classList.remove('d-none');
+                displayError.textContent = event.error.message;
+                displaySuccess.classList.add('d-none');
+            } else {
+                displayError.classList.add('d-none');
+                displaySuccess.textContent = 'Cartão válido';
+            }
+        });
+    })()
+</script>
+
+{{end}}
