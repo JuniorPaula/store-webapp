@@ -283,10 +283,16 @@ func (app *application) ChargeOne(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) PremiumPlans(w http.ResponseWriter, r *http.Request) {
-	intMap := make(map[string]int)
-	intMap["plan_id"] = 1
+	widget, err := app.DB.GetWidget(2)
+	if err != nil {
+		log.Println("ERROR: to get widget", err)
+		return
+	}
 
-	if err := app.renderTemplate(w, r, "premium-plans", &templateData{IntMap: intMap}); err != nil {
+	data := make(map[string]interface{})
+	data["widget"] = widget
+
+	if err := app.renderTemplate(w, r, "premium-plans", &templateData{Data: data}); err != nil {
 		app.errorLog.Println(err.Error())
 		return
 	}
