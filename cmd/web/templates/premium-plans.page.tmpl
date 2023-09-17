@@ -47,7 +47,7 @@
             
             <form action="/payment-succeeded" method="post" name="charge_form" id="charge_form" class="d-block needs-validations charge-form" autocomplete="off" novalidate="">
 
-                <input type="hidden" name="product_id" value="{{$widget.ID}}">
+                <input type="hidden" name="product_id" id="product_id" value="{{$widget.ID}}">
                 <input type="hidden" name="amount" id="amount" value="{{$widget.Price}}">
 
                 <p class="mb-3">{{$widget.Description}}</p>
@@ -181,8 +181,15 @@
             let payload = {
                 plan: '{{$widget.PlanID}}',
                 payment_method: result.paymentMethod.id,
-                email: document.getElementById('cardholder-email').value,
                 last_four: result.paymentMethod.card.last4,
+                card_brand: result.paymentMethod.card.brand,
+                expiry_month: result.paymentMethod.card.exp_month,
+                expiry_year: result.paymentMethod.card.exp_year,
+                email: document.getElementById('cardholder-email').value,
+                product_id: document.getElementById('product_id').value,
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                amount: document.getElementById('amount').value,
             }
 
             const requestOptions = {
