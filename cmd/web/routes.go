@@ -20,6 +20,8 @@ func (app *application) routes() http.Handler {
 	mux.Post("/payment-succeeded", app.PaymentSucceeded)
 	mux.Get("/widget/{id}", app.ChargeOne)
 
+	mux.Get("/plans/premium", app.PremiumPlans)
+
 	// Create a file server which serves files out of the "./static" directory.
 	fileServer := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

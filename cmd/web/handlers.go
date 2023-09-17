@@ -281,3 +281,13 @@ func (app *application) ChargeOne(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) PremiumPlans(w http.ResponseWriter, r *http.Request) {
+	intMap := make(map[string]int)
+	intMap["plan_id"] = 1
+
+	if err := app.renderTemplate(w, r, "premium-plans", &templateData{IntMap: intMap}); err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+}
