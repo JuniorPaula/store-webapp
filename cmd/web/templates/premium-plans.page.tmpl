@@ -179,7 +179,7 @@
         } else {
             // create a customer and subscribe to plan
             let payload = {
-                plan: '{{$widget.StripePlanID}}',
+                plan: '{{$widget.PlanID}}',
                 payment_method: result.paymentMethod.id,
                 email: document.getElementById('cardholder-email').value,
                 last_four: result.paymentMethod.card.last4,
