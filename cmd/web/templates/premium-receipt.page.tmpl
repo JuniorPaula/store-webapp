@@ -1,0 +1,60 @@
+{{template "base" .}}
+
+{{define "css"}}
+    <style>
+        .card {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 10px 30px;
+            border: 1px solid #ccc;
+            margin-top: 80px;
+            background-color: #e9ecef;
+        }
+        .card-header {
+            background-color: #e9ecef;
+        }
+    </style>
+{{end}}
+
+{{define "title"}}
+Pagamento realizado com sucesso
+{{end}}
+
+{{define "content"}}
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="mt-2">Inscrição realizado com sucesso</h2>
+    </div>
+    <div class="card-body">
+        <p>
+            <strong>Nome do cliente</strong>: 
+            <span id="first_name"></span> <span id="last_name"></span>
+        </p>
+        <p>
+            <strong>Valor do pagamento</strong>: 
+            <span id="amount"></span>
+        </p>
+        <p>
+            <strong>Útimos dígitos</strong>: 
+            <span id="last_four"></span>
+        </p>
+
+        <div class="my-3">
+            <a href="/home" class="btn btn-primary">Voltar</a>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "js"}}
+<script>
+    if(sessionStorage.first_name) {
+        document.getElementById('first_name').innerHTML = sessionStorage.first_name;
+        document.getElementById('last_name').innerHTML = sessionStorage.last_name;
+        document.getElementById('amount').innerHTML = sessionStorage.amount;
+        document.getElementById('last_four').innerHTML = sessionStorage.last_four;
+        sessionStorage.clear();
+    }
+</script>
+{{end}}

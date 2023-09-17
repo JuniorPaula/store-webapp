@@ -21,6 +21,7 @@ func (app *application) routes() http.Handler {
 	mux.Get("/widget/{id}", app.ChargeOne)
 
 	mux.Get("/plans/premium", app.PremiumPlans)
+	mux.Get("/receipt/premium", app.PremiumReceipt)
 
 	// Create a file server which serves files out of the "./static" directory.
 	fileServer := http.FileServer(http.Dir("./static"))

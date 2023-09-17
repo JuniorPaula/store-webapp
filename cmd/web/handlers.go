@@ -297,3 +297,10 @@ func (app *application) PremiumPlans(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) PremiumReceipt(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "premium-receipt", &templateData{}); err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+}
