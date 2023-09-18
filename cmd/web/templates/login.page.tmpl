@@ -1,0 +1,71 @@
+{{template "base" .}}
+
+{{define "css"}}
+    <style>
+        .card {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 10px 30px;
+            border: 1px solid #ccc;
+            margin-top: 80px;
+            background-color: #e9ecef;
+        }
+
+        .card-header {
+            background-color: #e9ecef;
+        }
+
+        #card-messages {
+            position: fixed;
+            top: 0;
+            right: 0;
+            /* z-index: 9999; */
+            width: 300px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+    </style>
+{{end}}
+
+{{define "title"}}
+    Login
+{{end}}
+
+{{define "content"}}
+<div id="card-messages"></div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="text-center">Login</h2>
+    </div>
+    <div class="card-body">
+        <form action="" method="post" name="login_form" id="login_form" class="d-block needs-validations login-form" autocomplete="off" novalidate="">
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required autocomplete="email-new" placeholder="Digite seu email">
+            </div>
+    
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" required autocomplete="password-new" placeholder="Digite sua senha">
+            </div>
+    
+            <hr />
+    
+            <a href="javascript:void(0)" class="btn btn-primary" onclick="val()">Login</a>
+        </form>
+    </div>
+</div>
+{{end}}
+
+{{define "js"}}
+<script>
+    function val(){}
+</script>
+{{end}}

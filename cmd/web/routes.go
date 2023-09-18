@@ -10,7 +10,7 @@ func (app *application) routes() http.Handler {
 	mux := chi.NewRouter()
 	mux.Use(SessionLoad)
 
-	mux.Get("/home", app.Home)
+	mux.Get("/", app.Home)
 
 	mux.Get("/virtual-terminal", app.VirtualTerminal)
 	mux.Post("/virtual-terminal-payment-succeeded", app.VirtualTerminalPaymentSucceeded)
@@ -22,6 +22,9 @@ func (app *application) routes() http.Handler {
 
 	mux.Get("/plans/premium", app.PremiumPlans)
 	mux.Get("/receipt/premium", app.PremiumReceipt)
+
+	//auth routes
+	mux.Get("/login", app.LoginPage)
 
 	// Create a file server which serves files out of the "./static" directory.
 	fileServer := http.FileServer(http.Dir("./static"))
