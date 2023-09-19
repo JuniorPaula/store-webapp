@@ -73,3 +73,23 @@ func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err e
 
 	return nil
 }
+
+// unauthorized is a helper to send a JSON response with a 401 Unauthorized
+// status code and a given error message.
+func (app *application) unauthorized(w http.ResponseWriter) error {
+	var payload struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	payload.Error = true
+	payload.Message = "Unauthorized"
+
+	err := app.writeJSON(w, http.StatusUnauthorized, payload)
+	if err != nil {
+		app.errorLog.Println(err)
+		return err
+	}
+
+	return nil
+}
