@@ -275,6 +275,13 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// save to the database.
+	err = app.DB.InsertToken(token, user)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
 	// send response
 	var payload struct {
 		Error   bool          `json:"error"`
