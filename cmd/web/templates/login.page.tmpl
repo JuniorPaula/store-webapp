@@ -15,7 +15,7 @@
         background-color: #e9ecef;
     }
 
-    #card-messages {
+    #toast-message {
         position: fixed;
         top: 0;
         right: 0;
@@ -37,7 +37,7 @@ Login
 {{end}}
 
 {{define "content"}}
-<div id="card-messages"></div>
+<div id="toast-message"></div>
 
 <div class="card">
     <div class="card-header">
@@ -69,6 +69,27 @@ Login
 
 {{define "js"}}
 <script>
+    const toastMessage = document.getElementById('toast-message');
+
+    function showError(msg) {
+        toastMessage.textContent = msg;
+        toastMessage.classList.remove('d-none');
+        toastMessage.style.backgroundColor = '#dc3545';
+
+        setTimeout(() => {
+            toastMessage.classList.add('d-none');
+        }, 5000);
+    }
+
+    function showSuccess() {
+        toastMessage.textContent = 'Login realizado com sucesso!';
+        toastMessage.classList.remove('d-none');
+        toastMessage.style.backgroundColor = '#28a745';
+
+        setTimeout(() => {
+            toastMessage.classList.add('d-none');
+        }, 5000);
+    }
     function val() {
         let form = document.getElementById('login_form');
         if (form.checkValidity() === false) {
@@ -95,6 +116,14 @@ Login
             .then(response => response.json())
             .then(response => {
                 console.log("resp::", response)
+                if (response.error === false) {
+                    localStorage.setItem('token', response.authentication_token.token);
+                    localStorage.setItem('token_expiry', response.authentication_token.expiry);
+                    showSuccess();
+
+                } else {
+                    showError("Email ou senha inválidos!");
+                }
             })
     }
 </script>

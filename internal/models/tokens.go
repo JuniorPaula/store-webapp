@@ -48,12 +48,22 @@ func (m *DBModel) InsertToken(t *Token, u User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
+	// delete existing tokens for this user and scope.
 	stmt := `
+		delete from tokens
+		where user_id = ?
+	`
+	_, err := m.DB.ExecContext(ctx, stmt, t.UserID)
+	if err != nil {
+		return err
+	}
+
+	stmt = `
 		insert into tokens (user_id, name, email, token_hash, created_at, updated_at)
 		values (?, ?, ?, ?, ?, ?)
 	`
 
-	_, err := m.DB.ExecContext(ctx, stmt,
+	_, err = m.DB.ExecContext(ctx, stmt,
 		t.UserID,
 		u.FirstName,
 		u.Email,
