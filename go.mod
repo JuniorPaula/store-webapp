@@ -11,4 +11,7 @@ require (
 
 require github.com/go-sql-driver/mysql v1.7.1
 
-require github.com/alexedwards/scs/v2 v2.5.1
+require (
+	github.com/alexedwards/scs/v2 v2.5.1
+	golang.org/x/crypto v0.13.0
+)

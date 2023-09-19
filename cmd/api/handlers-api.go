@@ -261,6 +261,11 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// validate the password; send error if invalid password.
+	validPassword, err := app.passwordMatches(user.Password, userInput.Password)
+	if !validPassword || err != nil {
+		app.unauthorized(w)
+		return
+	}
 
 	// create a new AuthToken for the user.
 
