@@ -121,6 +121,10 @@ Login
                     localStorage.setItem('token_expiry', response.authentication_token.expiry);
                     showSuccess();
 
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 5000);
+
                 } else {
                     showError("Email ou senha inválidos!");
                 }
