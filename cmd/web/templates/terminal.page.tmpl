@@ -88,6 +88,8 @@
 
 {{define "js"}}
 <script>
+    checkAuth();
+    
     document.getElementById('charge_amount').addEventListener('change', changeAmount);
 
     function changeAmount(evt) {
