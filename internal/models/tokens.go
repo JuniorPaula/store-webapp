@@ -77,3 +77,37 @@ func (m *DBModel) InsertToken(t *Token, u User) error {
 
 	return nil
 }
+
+// GetUserByToken gets a user by a specific token.
+func (m *DBModel) GetUserByToken(token string) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	tokenHash := sha256.Sum256([]byte(token))
+	var user User
+
+	query := `
+		select 
+			u.id, u.first_name, u.last_name, u.email
+		from 
+			tokens t
+		left join 
+			users u on (t.user_id = u.id)
+		where 
+			token_hash = ?
+	`
+
+	row := m.DB.QueryRowContext(ctx, query, tokenHash[:])
+	err := row.Scan(
+		&user.ID,
+		&user.FirstName,
+		&user.LastName,
+		&user.Email,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}

@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"webapp/internal/card"
 	"webapp/internal/models"
@@ -296,6 +298,47 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 	_ = app.writeJSON(w, http.StatusOK, payload)
 }
 
+func (app *application) authenticateToken(r *http.Request) (*models.User, error) {
+	// get the token from the request header.
+	// validate the token and get associated user.
+	authorizationHeader := r.Header.Get("Authorization")
+	if authorizationHeader == "" {
+		return nil, errors.New("authorization header required")
+	}
+
+	headerParts := strings.Split(authorizationHeader, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		return nil, errors.New("authorization header format must be Bearer {token}")
+	}
+
+	token := headerParts[1]
+	if len(token) != 26 {
+		return nil, errors.New("token must be 26 characters long")
+	}
+
+	user, err := app.DB.GetUserByToken(token)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	return user, nil
+}
+
 func (app *application) IsAuthenticated(w http.ResponseWriter, r *http.Request) {
-	app.unauthorized(w)
+	// validate the token and get associated user.
+	user, err := app.authenticateToken(r)
+	if err != nil {
+		app.unauthorized(w)
+		return
+	}
+
+	// send response
+	var payload struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+	payload.Error = false
+	payload.Message = fmt.Sprintf("user %s is authenticated", user.Email)
+
+	app.writeJSON(w, http.StatusOK, payload)
 }
