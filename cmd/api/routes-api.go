@@ -27,5 +27,13 @@ func (app *application) routes() http.Handler {
 	mux.Post("/api/v1/authenticate", app.CreateAuthToken)
 	mux.Post("/api/v1/is-authenticate", app.IsAuthenticated)
 
+	mux.Route("/api/v1/admin", func(mux chi.Router) {
+		mux.Use(app.Auth)
+
+		mux.Get("/test", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("The secret admin test endpoint"))
+		})
+	})
+
 	return mux
 }
