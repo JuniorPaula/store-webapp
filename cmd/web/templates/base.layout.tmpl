@@ -85,6 +85,7 @@
           loginLink.innerHTML = '<a class="nav-link" onclick="logout()" href="#!">Logout</a>';
           vtLink.classList.remove('d-none');
         } else {
+          vtLink.classList.add('d-none');
           loginLink.innerHTML = '<a class="nav-link" href="/login">Login</a>';
         }
 
@@ -95,7 +96,7 @@
         localStorage.removeItem("token");
         localStorage.removeItem("token_expiry");
         
-        window.location.href = '/login';
+        window.location.href = '/logout';
       }
 
       function checkAuth() {
