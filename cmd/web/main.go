@@ -12,6 +12,7 @@ import (
 	"webapp/internal/driver"
 	"webapp/internal/models"
 
+	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/joho/godotenv"
 )
@@ -96,6 +97,7 @@ func main() {
 	// set up session
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
+	session.Store = mysqlstore.New(conn)
 
 	tc := make(map[string]*template.Template)
 

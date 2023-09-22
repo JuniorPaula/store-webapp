@@ -15,3 +15,5 @@ require (
 	github.com/alexedwards/scs/v2 v2.5.1
 	golang.org/x/crypto v0.13.0
 )
+
+require github.com/alexedwards/scs/mysqlstore v0.0.0-20230902070821-95fa2ac9d520
