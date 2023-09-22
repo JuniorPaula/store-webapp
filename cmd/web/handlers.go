@@ -20,7 +20,7 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 
 // VirtualTerminal is a handler which renders a page where the user can enter their payment details.
 func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
-	if err := app.renderTemplate(w, r, "terminal", &templateData{}, "stripe-js"); err != nil {
+	if err := app.renderTemplate(w, r, "terminal", &templateData{}); err != nil {
 		app.errorLog.Println(err.Error())
 		return
 	}
