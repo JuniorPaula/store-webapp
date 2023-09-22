@@ -44,7 +44,7 @@ Login
         <h2 class="text-center">Login</h2>
     </div>
     <div class="card-body">
-        <form action="" method="post" name="login_form" id="login_form" class="d-block needs-validations login-form"
+        <form action="/login" method="post" name="login_form" id="login_form" class="d-block needs-validations login-form"
             autocomplete="off" novalidate="">
 
             <div class="mb-3">
@@ -121,9 +121,7 @@ Login
                     localStorage.setItem('token_expiry', response.authentication_token.expiry);
                     showSuccess();
 
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1000);
+                    document.getElementById('login_form').submit();
 
                 } else {
                     showError("Email ou senha inválidos!");

@@ -312,3 +312,28 @@ func (app *application) LoginPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+// PostLoginPage handles the login form submission.
+func (app *application) PostLoginPage(w http.ResponseWriter, r *http.Request) {
+	app.Session.RenewToken(r.Context())
+
+	err := r.ParseForm()
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	id, err := app.DB.Authenticate(email, password)
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		app.Session.Put(r.Context(), "flash", "Invalid credentials")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	app.Session.Put(r.Context(), "user_id", id)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

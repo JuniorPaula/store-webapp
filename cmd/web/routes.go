@@ -26,6 +26,7 @@ func (app *application) routes() http.Handler {
 
 	//auth routes
 	mux.Get("/login", app.LoginPage)
+	mux.Post("/login", app.PostLoginPage)
 
 	// Create a file server which serves files out of the "./static" directory.
 	fileServer := http.FileServer(http.Dir("./static"))
