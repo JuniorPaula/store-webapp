@@ -315,3 +315,21 @@ func (m *DBModel) Authenticate(email, password string) (int, error) {
 
 	return id, nil
 }
+
+// UpdatePassword updates a user's password.
+func (m *DBModel) UpdatePassword(hash string, user User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		update users
+		set password = ?
+		where id = ?
+	`
+	_, err := m.DB.ExecContext(ctx, stmt, hash, user.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

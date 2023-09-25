@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stripe/stripe-go/v75"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type stripePayload struct {
@@ -462,4 +463,44 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	resp.Message = "email enviado com sucesso"
 
 	app.writeJSON(w, http.StatusCreated, resp)
+}
+
+func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var payload struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := app.readJSON(w, r, &payload)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	user, err := app.DB.GetUserByEmail(payload.Email)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	nexHash, err := bcrypt.GenerateFromPassword([]byte(payload.Password), 12)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	err = app.DB.UpdatePassword(string(nexHash), user)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+	resp.Error = false
+	resp.Message = "senha alterada com sucesso"
+
+	app.writeJSON(w, http.StatusOK, resp)
 }
