@@ -25,6 +25,12 @@ type config struct {
 		secret string
 		key    string
 	}
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+	}
 }
 
 type application struct {
@@ -70,6 +76,10 @@ func main() {
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_NAME"),
 	)
+	cfg.smtp.host = os.Getenv("SMTP_HOST")
+	cfg.smtp.port = 587
+	cfg.smtp.username = os.Getenv("SMTP_USERNAME")
+	cfg.smtp.password = os.Getenv("SMTP_PASSWORD")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
