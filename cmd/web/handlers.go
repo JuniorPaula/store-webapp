@@ -370,6 +370,13 @@ func (app *application) PasswordReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// make sure not expired
+	expired := signer.Expired(testURL, 60)
+	if expired {
+		app.errorLog.Println("[ERROR] invalid url - link expired")
+		return
+	}
+
 	data := make(map[string]interface{})
 	data["email"] = r.URL.Query().Get("email")
 
