@@ -32,6 +32,8 @@ type config struct {
 		secret string
 		key    string
 	}
+	secretKey string
+	frontend  string
 }
 
 type application struct {
@@ -83,6 +85,8 @@ func main() {
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_NAME"),
 	)
+	cfg.secretKey = os.Getenv("SECRET_KEY")
+	cfg.frontend = os.Getenv("FRONTEND_URL")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

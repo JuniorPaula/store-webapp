@@ -29,6 +29,7 @@ func (app *application) routes() http.Handler {
 	mux.Post("/login", app.PostLoginPage)
 	mux.Get("/logout", app.Logout)
 	mux.Get("/forgot-password", app.ForgotPassword)
+	mux.Get("/password-reset", app.PasswordReset)
 
 	// Create a file server which serves files out of the "./static" directory.
 	fileServer := http.FileServer(http.Dir("./static"))
