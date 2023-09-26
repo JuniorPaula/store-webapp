@@ -41,6 +41,14 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 	td.StripeSecretKey = app.config.stripe.secret
 	td.StripePublishableKey = app.config.stripe.key
 
+	// Check if the user is authenticated. If they are, add the authenticated
+	// user's ID to the template data.
+	if app.Session.Exists(r.Context(), "user_id") {
+		td.IsAuthenticated = 1
+	} else {
+		td.IsAuthenticated = 0
+	}
+
 	return td
 }
 
