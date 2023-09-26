@@ -41,26 +41,37 @@ Todas as vendas
     fetch('{{.API}}'+ '/admin/all-sales', requestOptions)
         .then(response => response.json())
         .then(function(data) {
-            console.log(data)
+            if (data) {
+                data.forEach(function(i) {
+                    let newRow = tbody.insertRow()
+                    let newCell = newRow.insertCell()
 
-            data.forEach(function(i) {
+                    newCell.innerHTML = `<a href="/admin/sales/${i.id}">Pedido ${i.id}</a>`
+                    newCell = newRow.insertCell()
+
+                    let item = document.createTextNode(i.customer.first_name + " " + i.customer.last_name)
+                    newCell.appendChild(item)
+
+                    newCell = newRow.insertCell()
+                    item = document.createTextNode(i.widget.name)
+                    newCell.appendChild(item)
+
+                    let currency = formatCurrency(i.transaction.amount)
+                    newCell = newRow.insertCell()
+                    item = document.createTextNode(currency)
+                    newCell.appendChild(item)
+                });
+            } else {
                 let newRow = tbody.insertRow()
                 let newCell = newRow.insertCell()
-
-                newCell.innerHTML = `<a href="/admin/sales/${i.id}">Pedido ${i.id}</a>`
-                newCell = newRow.insertCell()
-
-                let item = document.createTextNode(i.customer.first_name + " " + i.customer.last_name)
-                newCell.appendChild(item)
-
-                newCell = newRow.insertCell()
-                item = document.createTextNode(i.widget.name)
-                newCell.appendChild(item)
-
-                newCell = newRow.insertCell()
-                item = document.createTextNode(i.transaction.amount)
-                newCell.appendChild(item)
-            });
+                newCell.colSpan = 4
+                newCell.innerHTML = "Nenhuma venda encontrada"
+            }
         })
+
+    function formatCurrency(value) {
+        let c = parseFloat(value/100);
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c);
+    }
 </script>
 {{end}}
