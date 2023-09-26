@@ -552,3 +552,17 @@ func (app *application) GetAllSubscriptions(w http.ResponseWriter, r *http.Reque
 
 	app.writeJSON(w, http.StatusOK, allSubscriptions)
 }
+
+func (app *application) GetSubscription(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	subscriptionID, _ := strconv.Atoi(id)
+
+	subscription, err := app.DB.GetSubscriptionByID(subscriptionID)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.badRequest(w, r, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, subscription)
+}

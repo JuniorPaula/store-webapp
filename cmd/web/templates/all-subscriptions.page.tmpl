@@ -45,7 +45,7 @@ Todas as inscrições
                     let newRow = tbody.insertRow()
                     let newCell = newRow.insertCell()
 
-                    newCell.innerHTML = `<a href="/admin/subscriptions/${i.id}">Pedido ${i.id}</a>`
+                    newCell.innerHTML = `<a href="/admin/subscription/${i.id}">Pedido ${i.id}</a>`
                     newCell = newRow.insertCell()
 
                     let item = document.createTextNode(i.customer.first_name + " " + i.customer.last_name)
