@@ -423,3 +423,11 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 		return
 	}
 }
+
+func (app *application) ShowSubscription(w http.ResponseWriter, r *http.Request) {
+
+	if err := app.renderTemplate(w, r, "subscription", &templateData{}); err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+}
