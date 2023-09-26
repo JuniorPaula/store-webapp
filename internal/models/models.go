@@ -410,3 +410,77 @@ func (m *DBModel) GetAllOrders() ([]*Order, error) {
 
 	return orders, nil
 }
+
+// GetAllSubscriptions returns all subscriptions.
+func (m *DBModel) GetAllSubscriptions() ([]*Order, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		select
+			o.id, o.widget_id, o.transaction_id, o.customer_id, o.status_id, o.quantity, o.amount,
+			w.id, w.name, t.id, t.amount, t.currency, t.last_four, t.expiry_month, t.expiry_year, t.payment_intent, t.payment_method, t.bank_return_code, c.id, c.first_name, c.last_name, c.email,
+			o.created_at, o.updated_at
+		from
+			orders o
+		left join
+			widgets w on (o.widget_id = w.id)
+		left join
+			transactions t on (o.transaction_id = t.id)
+		left join
+			customers c on (o.customer_id = c.id)
+		where
+			w.is_recurring = 1
+		order by
+			o.created_at desc
+	`
+
+	rows, err := m.DB.QueryContext(ctx, stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orders []*Order
+
+	for rows.Next() {
+		var o Order
+		err = rows.Scan(
+			&o.ID,
+			&o.WidgetID,
+			&o.TransactionID,
+			&o.CustomerID,
+			&o.StatusID,
+			&o.Quantity,
+			&o.Amount,
+			&o.Widget.ID,
+			&o.Widget.Name,
+			&o.Transaction.ID,
+			&o.Transaction.Amount,
+			&o.Transaction.Currency,
+			&o.Transaction.Lastfour,
+			&o.Transaction.ExpiryMonth,
+			&o.Transaction.ExpiryYear,
+			&o.Transaction.PaymentIntent,
+			&o.Transaction.PaymentMethod,
+			&o.Transaction.BankReturnCode,
+			&o.Customer.ID,
+			&o.Customer.FirstName,
+			&o.Customer.LastName,
+			&o.Customer.Email,
+			&o.CreatedAt,
+			&o.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		orders = append(orders, &o)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
