@@ -1,0 +1,70 @@
+{{template "base" .}}
+
+{{define "title"}}
+Venda
+{{end}}
+
+{{define "content"}}
+<div class="card mt-4">
+    <div class="card-header">
+        <h2 class="mt-2">Venda</h2>
+    </div>
+    <div class="card-body">
+        <p>
+            <strong>Nº Venda:</strong> 
+            <span id="sale-id"></span>
+        </p>
+        <p>
+            <strong>Cliente:</strong>
+            <span id="sale-customer"></span>
+        </p>
+        <p>
+            <strong>Produto:</strong>
+            <span id="sale-widget"></span>
+        </p>
+        <p>
+            <strong>Valor:</strong>
+            <span id="sale-amount"></span>
+        </p>
+    </div>
+    <div class="card-footer">
+        <a href="/admin/all-sales" class="btn btn-info">Cancelar</a>
+        <a href="#!" class="btn btn-warning">Reembolso</a>
+    </div>
+</div>
+{{end}}
+
+{{define "js"}}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let token = localStorage.getItem("token");
+    let saleId = window.location.pathname.split("/").pop();
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+    }
+
+    fetch('{{.API}}'+ '/admin/get-sale/' + saleId, requestOptions)
+        .then(response => response.json())
+        .then(function(data) {
+            if (data) {
+                document.getElementById("sale-id").innerHTML = data.id;
+                document.getElementById("sale-customer").innerHTML = data.customer.first_name + " " + data.customer.last_name;
+                document.getElementById("sale-widget").innerHTML = data.widget.name;
+                document.getElementById("sale-amount").innerHTML = formatCurrency(data.transaction.amount);
+            }
+        })
+
+    function formatCurrency(value) {
+        let c = parseFloat(value/100);
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c);
+    }
+    
+});
+</script>
+{{end}}
