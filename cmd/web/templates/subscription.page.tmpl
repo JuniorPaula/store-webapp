@@ -8,6 +8,8 @@ Inscrições
 <div class="card mt-4">
     <div class="card-header">
         <h2 class="mt-2">Inscrições</h2>
+        <span id="canceled" class="badge bg-danger d-none">Cancelada</span>
+        <span id="charged" class="badge bg-success d-none">Cobrado</span>
     </div>
     <div class="card-body">
         <p>
@@ -29,42 +31,125 @@ Inscrições
     </div>
     <div class="card-footer">
         <a href="/admin/all-subscriptions" class="btn btn-info">Cancelar</a>
-        <a href="#!" class="btn btn-warning">Reembolso</a>
+        <a href="#!" id="cancel-subscription-btn" class="btn btn-warning">Reembolso</a>
     </div>
+
+    <input type="hidden" id="payment_intent" value="">
+    <input type="hidden" id="amount" value="">
+    <input type="hidden" id="currency" value="">
 </div>
 {{end}}
 
 {{define "js"}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
     let token = localStorage.getItem("token");
     let saleId = window.location.pathname.split("/").pop();
+   
+    document.addEventListener("DOMContentLoaded", function() {
 
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        },
-    }
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+        }
 
-    fetch('{{.API}}'+ '/admin/get-subscription/' + saleId, requestOptions)
-        .then(response => response.json())
-        .then(function(data) {
-            if (data) {
-                document.getElementById("sale-id").innerHTML = data.id;
-                document.getElementById("sale-customer").innerHTML = data.customer.first_name + " " + data.customer.last_name;
-                document.getElementById("sale-widget").innerHTML = data.widget.name;
-                document.getElementById("sale-amount").innerHTML = formatCurrency(data.transaction.amount);
+        fetch('{{.API}}'+ '/admin/get-subscription/' + saleId, requestOptions)
+            .then(response => response.json())
+            .then(function(data) {
+                if (data) {
+                    document.getElementById("sale-id").innerHTML = data.id;
+                    document.getElementById("sale-customer").innerHTML = data.customer.first_name + " " + data.customer.last_name;
+                    document.getElementById("sale-widget").innerHTML = data.widget.name;
+                    document.getElementById("sale-amount").innerHTML = formatCurrency(data.transaction.amount);
+                    
+                    document.getElementById("payment_intent").value = data.transaction.payment_intent;
+                    document.getElementById("amount").value = data.transaction.amount;
+                    document.getElementById("currency").value = data.transaction.currency;
+
+                    if (data.status_id === 1) {
+                        document.getElementById('cancel-subscription-btn').classList.remove("d-none")
+                        document.getElementById('charged').classList.remove("d-none")
+                    } else {
+                        document.getElementById('canceled').classList.remove("d-none")
+                    }
+                }
+            })
+
+            
+    });
+
+    let cancelSubscriptionbtn = document.getElementById("cancel-subscription-btn");
+    cancelSubscriptionbtn.addEventListener("click", cancelSubscription)
+
+    function cancelSubscription() {
+        Swal.fire({
+            title: 'Tem certeza?',
+            text: "Você não poderá reverter isso!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sim, cancelar inscrição!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let payload = {
+                    id: parseInt(saleId),
+                    payment_intent: document.getElementById("payment_intent").value,
+                    amount: parseInt(document.getElementById("amount").value),
+                    currency: document.getElementById("currency").value,
+                }
+
+                const requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(payload)
+                }
+
+                fetch('{{.API}}'+ '/admin/cancel-subscription', requestOptions)
+                    .then(response => response.json())
+                    .then(function(data) {
+                        if (!data.error) {
+                            Swal.fire({
+                                title: 'Cancelar Inscrição',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    document.getElementById('cancel-subscription-btn').classList.add("d-none")
+                                    document.getElementById('canceled').classList.remove("d-none")
+                                    document.getElementById('charged').classList.add("d-none")
+
+                                    window.location.href = "/admin/subscription/" + saleId
+                                }
+                            })
+                        } else {
+                            Swal.fire({
+                                title: 'Cancelar Inscrição',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            })
+                        }
+                    })
             }
         })
-
+    }
+   
     function formatCurrency(value) {
         let c = parseFloat(value/100);
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c);
     }
-    
-});
 </script>
 {{end}}
