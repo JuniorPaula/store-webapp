@@ -607,7 +607,50 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 		Message string `json:"message"`
 	}
 	resp.Error = false
-	resp.Message = "cobra estornada com sucesso"
+	resp.Message = "cobrança estornada com sucesso"
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
+
+// CancelSubscrition cancels a subscription in stripe.
+func (app *application) CancelSubscrition(w http.ResponseWriter, r *http.Request) {
+	var subToCancel struct {
+		ID            int    `json:"id"`
+		PaymentIntent string `json:"payment_intent"`
+		Currency      string `json:"currency"`
+	}
+
+	err := app.readJSON(w, r, &subToCancel)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	card := card.Card{
+		Secret:   app.config.stripe.secret,
+		Key:      app.config.stripe.key,
+		Currency: subToCancel.Currency,
+	}
+
+	err = card.CancelSubscription(subToCancel.PaymentIntent)
+	if err != nil {
+		app.badRequest(w, r, errors.New("erro ao cancelar a assinatura"))
+		return
+	}
+
+	// update status in the database
+	err = app.DB.UpdateOrderStatus(subToCancel.ID, 3)
+	if err != nil {
+		app.badRequest(w, r, errors.New("erro ao atualizar o status do pedido"))
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+	resp.Error = false
+	resp.Message = "Inscrição cancelada com sucesso"
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
