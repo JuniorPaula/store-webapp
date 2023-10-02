@@ -15,6 +15,7 @@ Todas as vendas
                     <th>Cliente</th>
                     <th>Produto</th>
                     <th>Valor</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(function(data) {
             if (data) {
+                console.log("orders***", data)
                 data.forEach(function(i) {
                     let newRow = tbody.insertRow()
                     let newCell = newRow.insertCell()
@@ -61,6 +63,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     newCell = newRow.insertCell()
                     item = document.createTextNode(currency)
                     newCell.appendChild(item)
+
+                    newCell = newRow.insertCell()
+                    if(i.status_id != 1) {
+                        newCell.innerHTML = `<span class="badge bg-success">Pago</span>`
+                    } else {
+                        newCell.innerHTML = `<span class="badge bg-warning">Pendente</span>`
+                    }
                 });
             } else {
                 let newRow = tbody.insertRow()
