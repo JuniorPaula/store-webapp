@@ -589,7 +589,7 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 
 	err = card.Refund(chargeToRefund.PaymentIntent, chargeToRefund.Amount)
 	if err != nil {
-		app.badRequest(w, r, err)
+		app.badRequest(w, r, errors.New("erro ao estornar a cobra"))
 		return
 	}
 
