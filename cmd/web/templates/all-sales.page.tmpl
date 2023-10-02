@@ -43,20 +43,33 @@ document.addEventListener("DOMContentLoaded", function() {
 function paginator(pages, currPage) {
     let p = document.getElementById("paginator")
 
-    let html = `<li class="page-item"><a href="#!" class="page-link pager" data-page="${currPage -1}">&lt;</a></li>`
+    let html = `<li class="page-item"><a href="#!" class="page-link pager" data-page="${currPage - 1}">&lt;</a></li>`
 
     for (let i = 0; i <= pages; i++) {
-        html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${i+1}">${i + 1}</a></li>`
+        console.log("i", i)
+        html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${i + 1}">${i + 1}</a></li>`
     }
 
     html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${currPage + 1}">&gt;</a></li>`
 
     p.innerHTML = html;
+
+    let pagerBtns = document.getElementsByClassName("pager")
+    for (let j = 0; j < pagerBtns.length; j++) {
+        pagerBtns[j].addEventListener("click", function(evt) {
+            let desiredPage = evt.target.getAttribute("data-page")
+
+            if ((desiredPage > 0) && (desiredPage <= pages + 1)) {
+                updateTable(desiredPage, pageSize)
+            }
+        })
+    }
 }
 
 function updateTable(current_page, page_size) {
     let token = localStorage.getItem("token");
     let tbody = document.getElementById("sales-tables").getElementsByTagName("tbody")[0];
+    tbody.innerHTML = ""
 
     const requestOptions = {
         method: 'POST',
@@ -66,8 +79,8 @@ function updateTable(current_page, page_size) {
             'Authorization': 'Bearer ' + token
         },
         body: JSON.stringify({
-            page_size: page_size,
-            page: current_page,
+            page_size: parseInt(page_size, 10),
+            current_page: parseInt(current_page, 10),
         })
     }
 
@@ -107,7 +120,7 @@ function updateTable(current_page, page_size) {
             } else {
                 let newRow = tbody.insertRow()
                 let newCell = newRow.insertCell()
-                newCell.colSpan = 4
+                newCell.colSpan = 5
                 newCell.innerHTML = "Nenhuma venda encontrada"
             }
         })

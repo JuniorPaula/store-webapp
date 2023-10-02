@@ -531,7 +531,7 @@ func (app *application) GetAllSales(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allSales, lastPage, totalRecord, err := app.DB.GetAllOrdersPaginated(2, 1)
+	allSales, lastPage, totalRecord, err := app.DB.GetAllOrdersPaginated(payload.PageSize, payload.CurrentPage)
 	if err != nil {
 		app.errorLog.Println(err)
 		app.badRequest(w, r, err)
@@ -545,9 +545,9 @@ func (app *application) GetAllSales(w http.ResponseWriter, r *http.Request) {
 		TotalRecords int             `json:"total_records"`
 		Orders       []*models.Order `json:"orders"`
 	}
-	resp.CurrentPage = 1
+	resp.CurrentPage = payload.CurrentPage
 	resp.PageSize = payload.PageSize
-	resp.PageSize = lastPage
+	resp.LastPage = lastPage
 	resp.TotalRecords = totalRecord
 	resp.Orders = allSales
 
