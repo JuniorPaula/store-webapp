@@ -37,6 +37,8 @@ func (app *application) routes() http.Handler {
 		mux.Post("/get-sale/{id}", app.GetSale)
 		mux.Post("/all-subscriptions", app.GetAllSubscriptions)
 		mux.Post("/get-subscription/{id}", app.GetSubscription)
+
+		mux.Post("/refund", app.RefundCharge)
 	})
 
 	return mux
