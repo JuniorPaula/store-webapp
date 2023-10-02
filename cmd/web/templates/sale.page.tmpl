@@ -8,6 +8,8 @@ Venda
 <div class="card mt-4">
     <div class="card-header">
         <h2 class="mt-2">Venda</h2>
+        <span id="refunded" class="badge bg-danger d-none">Reenbolso</span>
+        <span id="charged" class="badge bg-success d-none">Cobrado</span>
     </div>
     <div class="card-body">
         <p>
@@ -29,7 +31,7 @@ Venda
     </div>
     <div class="card-footer">
         <a href="/admin/all-sales" class="btn btn-info">Cancelar</a>
-        <a href="#!" id="refund-btn" class="btn btn-warning">Reembolso</a>
+        <a href="#!" id="refund-btn" class="btn btn-warning d-none">Reembolso</a>
     </div>
 
     <input type="hidden" id="payment_intent" value="">
@@ -67,6 +69,13 @@ Venda
                     document.getElementById("payment_intent").value = data.transaction.payment_intent;
                     document.getElementById("amount").value = data.transaction.amount;
                     document.getElementById("currency").value = data.transaction.currency;
+
+                    if (data.status_id === 1) {
+                        document.getElementById('refund-btn').classList.remove("d-none")
+                        document.getElementById('charged').classList.remove("d-none")
+                    } else {
+                        document.getElementById('refunded').classList.remove("d-none")
+                    }
                 }
             })
 
@@ -118,6 +127,10 @@ Venda
                                 confirmButtonText: 'Ok'
                             }).then((result) => {
                                 if (result.isConfirmed) {
+                                    document.getElementById('refund-btn').classList.add("d-none")
+                                    document.getElementById('refunded').classList.remove("d-none")
+                                    document.getElementById('charged').classList.add("d-none")
+
                                     window.location.href = "/admin/all-sales"
                                 }
                             })
