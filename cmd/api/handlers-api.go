@@ -589,7 +589,14 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 
 	err = card.Refund(chargeToRefund.PaymentIntent, chargeToRefund.Amount)
 	if err != nil {
-		app.badRequest(w, r, errors.New("erro ao estornar a cobra"))
+		app.badRequest(w, r, errors.New("erro ao estornar a compra"))
+		return
+	}
+
+	// update status in the database
+	err = app.DB.UpdateOrderStatus(chargeToRefund.ID, 2)
+	if err != nil {
+		app.badRequest(w, r, errors.New("erro ao atualizar o status do pedido"))
 		return
 	}
 
