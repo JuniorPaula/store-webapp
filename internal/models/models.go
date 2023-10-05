@@ -709,8 +709,8 @@ func (m *DBModel) UpdateOrderStatus(id, statusID int) error {
 	return nil
 }
 
-// GellAllUsers returns all users.
-func (m *DBModel) GellAllUsers() ([]*User, error) {
+// GetAllUsers returns all users.
+func (m *DBModel) GetAllUsers() ([]*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
