@@ -10,7 +10,46 @@ Usuário Administrador
 
 
 {{define "content"}}
-    <h2 class="mt-5">Usuário Administrador</h2>
+    <div class="card my-4">
+        <div class="card-header">
+            <h4 class="m-2">Usuário Administrador</h4>
+        </div>
+        <div class="card-body">
+            <form action="" method="post" id="user_form">
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Sobrenome</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="verify_password" class="form-label">Confirmação Senha</label>
+                    <input type="password" class="form-control" id="verify_password" name="verify_password" required>
+                </div>
+
+                <hr>
+
+                <div class="float-start">
+                    <a href="javascript:void(0)" class="btn btn-primary" id="saveBtn">Salvar</a>
+                    <a href="/admin/all-users" class="btn btn-warning" id="cancelBtn">Cancelar</a>
+                </div>
+                <div class="float-end">
+                    <a href="javascript:void(0)" class="btn btn-danger" id="deleteBtn">Deletar</a>
+                </div>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
 {{end}}
 
 {{define "js"}}
