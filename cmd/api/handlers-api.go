@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -702,4 +703,63 @@ func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.writeJSON(w, http.StatusOK, user)
+}
+
+// EditUser updates a user in the database.
+func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, _ := strconv.Atoi(id)
+
+	var user models.User
+
+	err := app.readJSON(w, r, &user)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	if userID > 0 {
+		err = app.DB.UpdateUser(user)
+		if err != nil {
+			log.Println(err)
+			app.badRequest(w, r, err)
+			return
+		}
+
+		if user.Password != "" {
+			nexHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+			if err != nil {
+				app.badRequest(w, r, err)
+				return
+			}
+
+			err = app.DB.UpdatePassword(string(nexHash), user)
+			if err != nil {
+				app.badRequest(w, r, err)
+				return
+			}
+		}
+	} else {
+		nexHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+		if err != nil {
+			app.badRequest(w, r, err)
+			return
+		}
+
+		_, err = app.DB.InsertUser(user, string(nexHash))
+		if err != nil {
+			app.badRequest(w, r, err)
+			return
+		}
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	resp.Message = "Usuário atualizado com sucesso"
+
+	app.writeJSON(w, http.StatusOK, resp)
 }
