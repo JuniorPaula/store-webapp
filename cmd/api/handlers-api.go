@@ -763,3 +763,25 @@ func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
 
 	app.writeJSON(w, http.StatusOK, resp)
 }
+
+// DeleteUser deletes a user from the database.
+func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, _ := strconv.Atoi(id)
+
+	err := app.DB.DeleteUser(userID)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	var resp struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	resp.Error = false
+	resp.Message = "Usuário deletado com sucesso"
+
+	app.writeJSON(w, http.StatusOK, resp)
+}
