@@ -22,4 +22,7 @@ require (
 	github.com/xhit/go-simple-mail v2.2.2+incompatible
 )
 
-require golang.org/x/sys v0.12.0 // indirect
+require (
+	github.com/gorilla/websocket v1.5.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+)
