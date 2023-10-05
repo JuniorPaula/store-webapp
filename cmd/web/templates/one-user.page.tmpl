@@ -10,50 +10,118 @@ Usuário Administrador
 
 
 {{define "content"}}
-    <div class="card my-4">
-        <div class="card-header">
-            <h4 class="m-2">Usuário Administrador</h4>
-        </div>
-        <div class="card-body">
-            <form action="" method="post" id="user_form">
-                <div class="mb-3">
-                    <label for="first_name" class="form-label">Nome</label>
-                    <input type="text" class="form-control" id="first_name" name="first_name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="last_name" class="form-label">Sobrenome</label>
-                    <input type="text" class="form-control" id="last_name" name="last_name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="verify_password" class="form-label">Confirmação Senha</label>
-                    <input type="password" class="form-control" id="verify_password" name="verify_password" required>
-                </div>
-
-                <hr>
-
-                <div class="float-start">
-                    <a href="javascript:void(0)" class="btn btn-primary" id="saveBtn">Salvar</a>
-                    <a href="/admin/all-users" class="btn btn-warning" id="cancelBtn">Cancelar</a>
-                </div>
-                <div class="float-end">
-                    <a href="javascript:void(0)" class="btn btn-danger" id="deleteBtn">Deletar</a>
-                </div>
-                <div class="clearfix"></div>
-            </form>
-        </div>
+<div class="card my-4">
+    <div class="card-header">
+        <h4 class="m-2">Usuário Administrador</h4>
     </div>
+    <div class="card-body">
+        <form action="" method="post" id="user_form">
+            <div class="mb-3">
+                <label for="first_name" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Sobrenome</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="verify_password" class="form-label">Confirmação Senha</label>
+                <input type="password" class="form-control" id="verify_password" name="verify_password" required>
+            </div>
+
+            <hr>
+
+            <div class="float-start">
+                <a href="javascript:void(0)" class="btn btn-primary" id="saveBtn">Salvar</a>
+                <a href="/admin/all-users" class="btn btn-warning" id="cancelBtn">Cancelar</a>
+            </div>
+            <div class="float-end">
+                <a href="javascript:void(0)" class="btn btn-danger d-none" id="deleteBtn">Deletar</a>
+            </div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+</div>
 {{end}}
 
 {{define "js"}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    let token = localStorage.getItem("token");
+    let id = window.location.pathname.split("/").pop();
+    let delBtn = document.getElementById("deleteBtn");
 
+    document.addEventListener("DOMContentLoaded", function () {
+        if (id !== '0') {
+            delBtn.classList.remove("d-none");
+
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                }
+            }
+
+            fetch('{{.API}}' + '/admin/all-users/' + id, requestOptions)
+                .then(response => response.json())
+                .then(function (data) {
+                    if (data) {
+                        document.getElementById("first_name").value = data.first_name;
+                        document.getElementById("last_name").value = data.last_name;
+                        document.getElementById("email").value = data.email;
+                    }
+                })
+        }
+    })
+
+    delBtn.addEventListener("click", function() {
+        Swal.fire({
+            title: 'Tem certeza?',
+            text: "Você não poderá reverter isso!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sim, delete!',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log("deletar", id)
+                // const requestOptions = {
+                //     method: 'DELETE',
+                //     headers: {
+                //         'Accept': 'application/json',
+                //         'Content-Type': 'application/json',
+                //         'Authorization': 'Bearer ' + token
+                //     }
+                // }
+
+                // fetch('{{.API}}' + '/admin/all-users/' + id, requestOptions)
+                //     .then(response => response.json())
+                //     .then(function (data) {
+                //         if (data) {
+                //             Swal.fire(
+                //                 'Deletado!',
+                //                 'O usuário foi deletado.',
+                //                 'success'
+                //             ).then((result) => {
+                //                 window.location.href = "/admin/all-users";
+                //             })
+                //         }
+                //     })
+            }
+        
+        })
+    })
 </script>
 {{end}}

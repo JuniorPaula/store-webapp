@@ -679,6 +679,7 @@ func (app *application) CancelSubscrition(w http.ResponseWriter, r *http.Request
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// AllUsers returns all users from the database.
 func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := app.DB.GetAllUsers()
 	if err != nil {
@@ -687,4 +688,18 @@ func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.writeJSON(w, http.StatusOK, users)
+}
+
+// OneUser returns one user from the database.
+func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	userID, _ := strconv.Atoi(id)
+
+	user, err := app.DB.GetOneUser(userID)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, user)
 }
