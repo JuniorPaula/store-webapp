@@ -110,8 +110,9 @@
 
   <script>
     '{{if eq .IsAuthenticated 1}}'
+      let socket;
       document.addEventListener("DOMContentLoaded", function (event) {
-        let socket = new WebSocket("ws://localhost:4000/ws");
+          socket = new WebSocket("ws://localhost:4000/ws");
           socket.onopen = function (event) {
             console.log("Connection established");
           };

@@ -19,10 +19,8 @@ require (
 require (
 	github.com/alexedwards/scs/mysqlstore v0.0.0-20230902070821-95fa2ac9d520
 	github.com/bwmarrin/go-alone v0.0.0-20190806015146-742bb55d1631
+	github.com/gorilla/websocket v1.5.0
 	github.com/xhit/go-simple-mail v2.2.2+incompatible
 )
 
-require (
-	github.com/gorilla/websocket v1.5.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
-)
+require golang.org/x/sys v0.12.0 // indirect

@@ -183,6 +183,13 @@ Usuário Administrador
                                 'O usuário foi deletado.',
                                 'success'
                             ).then((result) => {
+                                let jsonData = {
+                                    action: "DELETE_USER",
+                                    user_id: parseInt(id, 10),
+                                }
+
+                                socket.send(JSON.stringify(jsonData));
+
                                 window.location.href = "/admin/all-users";
                             })
                         } 
