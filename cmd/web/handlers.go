@@ -400,6 +400,8 @@ func (app *application) PasswordReset(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AllSales is a handler which renders a page where the user can change the
+// quantity of a product they want to buy.
 func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 
 	if err := app.renderTemplate(w, r, "all-sales", &templateData{}); err != nil {
@@ -408,6 +410,8 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ShowSale is a handler which renders a page where the user can change the
+// quantity of a product they want to buy.
 func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
 
 	if err := app.renderTemplate(w, r, "sale", &templateData{}); err != nil {
@@ -416,6 +420,8 @@ func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AllSubscriptions is a handler which renders a page where the user can change the
+// quantity of a product they want to buy.
 func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
 
 	if err := app.renderTemplate(w, r, "all-subscriptions", &templateData{}); err != nil {
@@ -424,9 +430,29 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// ShowSubscription is a handler which renders a page where the user can change the
+// subscription.
 func (app *application) ShowSubscription(w http.ResponseWriter, r *http.Request) {
 
 	if err := app.renderTemplate(w, r, "subscription", &templateData{}); err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+}
+
+// AllUsers is a handler which renders a page where list all users admin.
+func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
+
+	if err := app.renderTemplate(w, r, "all-users", &templateData{}); err != nil {
+		app.errorLog.Println(err.Error())
+		return
+	}
+}
+
+// OneUser is a handler which renders a page to show one user.
+func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
+
+	if err := app.renderTemplate(w, r, "one-user", &templateData{}); err != nil {
 		app.errorLog.Println(err.Error())
 		return
 	}
