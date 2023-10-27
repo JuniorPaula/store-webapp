@@ -22,23 +22,14 @@ type Order struct {
 
 func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Request) {
 	var order Order
-	// err := app.readJSON(w, r, &order)
-	// if err != nil {
-	// 	app.badRequest(w, r, err)
-	// 	return
-	// }
-
-	order.ID = 100
-	order.Quantity = 2
-	order.Amount = 1000
-	order.Product = "Test Product"
-	order.FirtsName = "Test"
-	order.LastName = "User"
-	order.Email = "user@email.com"
-	order.CreatedAt = time.Now()
+	err := app.readJSON(w, r, &order)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
 
 	// generate a pdf invoice
-	err := app.createInvoicePDF(order)
+	err = app.createInvoicePDF(order)
 	if err != nil {
 		app.errorLog.Println(err)
 		app.badRequest(w, r, err)
@@ -46,8 +37,15 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 	}
 
 	// create a new email message
+	attachments := []string{fmt.Sprintf("./invoices/invoice-%d.pdf", order.ID)}
 
 	// send the email
+	err = app.SendEmail("info@widgets.com", order.Email, "Sua Fatura", "invoice", attachments, nil)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.badRequest(w, r, err)
+		return
+	}
 
 	var resp struct {
 		Error   bool   `json:"error"`
