@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"os"
 )
 
 // writeJSON is a helper which encodes the given data to JSON, writes it with
@@ -71,6 +72,15 @@ func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err e
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
 	w.Write(out)
+
+	return nil
+}
+
+// CreateDirIfNotExist is a helper to create a directory if it does not exist.
+func (app *application) CreateDirIfNotExist(dir string) error {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return os.MkdirAll(dir, 0755)
+	}
 
 	return nil
 }

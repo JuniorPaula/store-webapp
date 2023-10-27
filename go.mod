@@ -23,4 +23,9 @@ require (
 	github.com/xhit/go-simple-mail v2.2.2+incompatible
 )
 
-require golang.org/x/sys v0.12.0 // indirect
+require (
+	github.com/phpdave11/gofpdf v1.4.2 // indirect
+	github.com/phpdave11/gofpdi v1.0.12 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+)

@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/phpdave11/gofpdf"
+	"github.com/phpdave11/gofpdf/contrib/gofpdi"
 )
 
 type Order struct {
@@ -19,13 +22,28 @@ type Order struct {
 
 func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Request) {
 	var order Order
-	err := app.readJSON(w, r, &order)
+	// err := app.readJSON(w, r, &order)
+	// if err != nil {
+	// 	app.badRequest(w, r, err)
+	// 	return
+	// }
+
+	order.ID = 100
+	order.Quantity = 2
+	order.Amount = 1000
+	order.Product = "Test Product"
+	order.FirtsName = "Test"
+	order.LastName = "User"
+	order.Email = "user@email.com"
+	order.CreatedAt = time.Now()
+
+	// generate a pdf invoice
+	err := app.createInvoicePDF(order)
 	if err != nil {
+		app.errorLog.Println(err)
 		app.badRequest(w, r, err)
 		return
 	}
-
-	// generate a pdf invoice
 
 	// create a new email message
 
@@ -39,4 +57,45 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 	resp.Message = fmt.Sprintf("Invoice for order %d.pdf created and sent to %s", order.ID, order.Email)
 
 	app.writeJSON(w, http.StatusCreated, resp)
+}
+
+func (app *application) createInvoicePDF(order Order) error {
+	pdf := gofpdf.New("P", "mm", "Letter", "")
+	pdf.SetMargins(10, 13, 10)
+	pdf.SetAutoPageBreak(true, 0)
+
+	importer := gofpdi.NewImporter()
+
+	t := importer.ImportPage(pdf, "./pdf-templates/invoice.pdf", 1, "/MediaBox")
+
+	pdf.AddPage()
+	importer.UseImportedTemplate(pdf, t, 0, 0, 215.9, 0)
+
+	// write info
+	pdf.SetY(50)
+	pdf.SetX(10)
+	pdf.SetFont("Times", "", 11)
+	pdf.CellFormat(97, 8, fmt.Sprintf("Attention: %s %s", order.FirtsName, order.LastName), "", 0, "L", false, 0, "")
+	pdf.Ln(5)
+	pdf.CellFormat(97, 8, fmt.Sprintf("Email: %s", order.Email), "", 0, "L", false, 0, "")
+	pdf.Ln(5)
+	pdf.CellFormat(97, 8, fmt.Sprintf("Date: %s", order.CreatedAt.Format("02/01/2006")), "", 0, "L", false, 0, "")
+
+	pdf.SetX(58)
+	pdf.SetY(93)
+	pdf.CellFormat(155, 8, order.Product, "", 0, "L", false, 0, "")
+	pdf.SetX(166)
+	pdf.CellFormat(20, 8, fmt.Sprintf("$%d", order.Quantity), "", 0, "R", false, 0, "")
+
+	pdf.SetX(185)
+	pdf.CellFormat(20, 8, fmt.Sprintf("R$%.2f", float32(order.Amount/100.0)), "", 0, "R", false, 0, "")
+
+	invoicePath := fmt.Sprintf("./invoices/invoice-%d.pdf", order.ID)
+	err := pdf.OutputFileAndClose(invoicePath)
+	if err != nil {
+		app.errorLog.Println(err)
+		return err
+	}
+
+	return nil
 }
